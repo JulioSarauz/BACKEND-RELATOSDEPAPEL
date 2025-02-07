@@ -79,12 +79,13 @@ public class BookController {
                     schema = @Schema(implementation = Book.class)))
     public ResponseEntity<List<Book>> searchBooks(
             @RequestParam(required = false) String title,
+            @RequestParam(required = false) Integer stock,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String isbn,
             @RequestParam(required = false) Double rating,
             @RequestParam(required = false) Boolean isVisible,
             @RequestParam(required = false) Long categoryId) {
-        List<Book> books = bookService.searchBooks(title, author, isbn, rating, isVisible, categoryId);
+        List<Book> books = bookService.searchBooks(title, stock, author, isbn, rating, isVisible, categoryId);
         return ResponseEntity.ok(books);
     }
 

@@ -106,11 +106,14 @@ public class BookService {
     }
 
     // 🔹 Buscar libros con filtros dinámicos
-    public List<Book> searchBooks(String title, String author, String isbn, Double rating, Boolean isVisible, Long categoryId) {
+    public List<Book> searchBooks(String title, Integer stock, String author, String isbn, Double rating, Boolean isVisible, Long categoryId) {
         SearchCriteria<Book> spec = new SearchCriteria<>();
 
         if (StringUtils.hasLength(title)) {
             spec.add(new SearchStatement("title", title, SearchOperation.MATCH));
+        }
+        if (stock != null) {
+            spec.add(new SearchStatement("stock", stock, SearchOperation.EQUAL));
         }
         if (StringUtils.hasLength(author)) {
             spec.add(new SearchStatement("author", author, SearchOperation.MATCH));
