@@ -1,5 +1,6 @@
 package com.unir.back_end_ms_books_catalogue.controller;
 
+import com.unir.back_end_ms_books_catalogue.dto.StockUpdateRequest;
 import com.unir.back_end_ms_books_catalogue.model.Book;
 import com.unir.back_end_ms_books_catalogue.service.BookService;
 import org.springframework.http.ResponseEntity;
@@ -100,6 +101,20 @@ public class BookController {
             return ResponseEntity.ok(patchedBook);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/stocks")
+    public ResponseEntity<?> updateBookStock(@PathVariable Long id, @RequestBody StockUpdateRequest stockUpdate) {
+        try {
+            Book updatedBook = bookService.updateBookStock(id, stockUpdate.getStock());
+            return ResponseEntity.ok(updatedBook);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("No hay suficiente stock disponible")) {
+                return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
     }
 }

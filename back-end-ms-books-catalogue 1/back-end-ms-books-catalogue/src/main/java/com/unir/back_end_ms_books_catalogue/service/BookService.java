@@ -132,4 +132,15 @@ public class BookService {
 
         return bookRepository.findAll(spec);
     }
+
+    public Book updateBookStock(Long id, Integer stockToDeduct) {
+        return bookRepository.findById(id).map(book -> {
+            if (book.getStock() != null && book.getStock() >= stockToDeduct) {
+                book.setStock(book.getStock() - stockToDeduct);
+                return bookRepository.save(book);
+            } else {
+                throw new RuntimeException("No hay suficiente stock disponible. Stock actual: " + book.getStock());
+            }
+        }).orElseThrow(() -> new RuntimeException("Libro no encontrado con ID: " + id));
+    }
 }
