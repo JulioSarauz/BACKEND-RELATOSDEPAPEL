@@ -42,13 +42,13 @@ public class PaymentController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Payment.class)))
     public ResponseEntity<List<Payment>> getPayments(
             @RequestHeader Map<String, String> headers,
-            @Parameter(name = "userId", description = "codigo usuario que compro", example = "219", required = false)
-            @RequestParam(required = false) String userId,
+            @Parameter(name = "carId", description = "codigo carrito que pago", example = "219", required = false)
+            @RequestParam(required = false) String carId,
             @Parameter(name = "amount", description = "monto pagado", example = "2.99", required = false)
             @RequestParam(required = false) Double amount) {
 
         log.info("headers: {}", headers);
-        List<Payment> payment = service.getPayments(userId, amount);
+        List<Payment> payment = service.getPayments(carId, amount);
 
         if (payment != null) {
             return ResponseEntity.ok(payment);

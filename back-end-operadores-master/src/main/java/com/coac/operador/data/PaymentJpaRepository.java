@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 interface PaymentJpaRepository extends JpaRepository<Payment, Long>, JpaSpecificationExecutor<Payment> {
-    List<Payment> findByUserId(String userId);
+    List<Payment> findByCarId(String carId);
     List<Payment> findByAmount(Double amount);
 }

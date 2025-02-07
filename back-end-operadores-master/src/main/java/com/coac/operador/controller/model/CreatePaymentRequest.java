@@ -9,6 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatePaymentRequest {
-    private String userId;
+    private String carId;
     private Double amount;
 }

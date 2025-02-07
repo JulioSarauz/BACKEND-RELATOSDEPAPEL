@@ -28,10 +28,10 @@ public class PaymentServiceImpl implements PaymentService {
     private ObjectMapper objectMapper;
 
     @Override
-    public List<Payment> getPayments(String userId, Double amount) {
+    public List<Payment> getPayments(String carId, Double amount) {
 
-        if (StringUtils.hasLength(userId) || amount != null) {
-            return repository.search(userId, amount);
+        if (StringUtils.hasLength(carId) || amount != null) {
+            return repository.search(carId, amount);
         }
 
         List<Payment> products = repository.getPayments();
@@ -60,10 +60,10 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment createPayment(CreatePaymentRequest request) {
 
         //Otra opcion: Jakarta Validation: https://www.baeldung.com/java-validation
-        if (request != null && StringUtils.hasLength(request.getUserId().trim())
+        if (request != null && StringUtils.hasLength(request.getCarId().trim())
                 && request.getAmount() != null) {
 
-            Payment payment = Payment.builder().userId(request.getUserId()).amount(request.getAmount()).build();
+            Payment payment = Payment.builder().carId(request.getCarId()).amount(request.getAmount()).build();
 
             return repository.save(payment);
         } else {

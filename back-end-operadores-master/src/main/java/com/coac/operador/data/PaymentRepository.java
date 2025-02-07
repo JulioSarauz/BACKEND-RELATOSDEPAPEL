@@ -33,11 +33,11 @@ public class PaymentRepository {
         repository.delete(product);
     }
 
-    public List<Payment> search(String userId, Double amount) {
+    public List<Payment> search(String carId, Double amount) {
         SearchCriteria<Payment> spec = new SearchCriteria<>();
 
-        if (StringUtils.isNotBlank(userId)) {
-            spec.add(new SearchStatement(Consts.USERID, userId, SearchOperation.MATCH));
+        if (StringUtils.isNotBlank(carId)) {
+            spec.add(new SearchStatement(Consts.CARID, carId, SearchOperation.MATCH));
         }
         if (amount != null) {
             spec.add(new SearchStatement(Consts.AMOUNT, amount, SearchOperation.EQUAL));

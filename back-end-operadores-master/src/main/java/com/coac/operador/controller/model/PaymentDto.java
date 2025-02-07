@@ -10,6 +10,6 @@ import lombok.*;
 @Builder
 @ToString
 public class PaymentDto {
-    private String userId;
+    private String carId;
     private Double amount;
 }

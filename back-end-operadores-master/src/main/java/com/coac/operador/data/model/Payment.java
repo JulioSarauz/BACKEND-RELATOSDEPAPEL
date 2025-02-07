@@ -29,15 +29,14 @@ public class Payment{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = Consts.USERID, unique = true)
-    private String userId;
+    @Column(name = Consts.CARID, unique = true)
+    private String carId;
 
     @Column(name = Consts.AMOUNT)
     private Double amount;
 
     public void update(PaymentDto paymentDto) {
-        this.userId = paymentDto.getUserId();
+        this.carId = paymentDto.getCarId();
         this.amount = paymentDto.getAmount();
     }
-
 }

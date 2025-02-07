@@ -7,7 +7,7 @@ import com.coac.operador.data.model.Payment;
 
 
 public interface PaymentService {
-    List<Payment> getPayments(String userId, Double amount);
+    List<Payment> getPayments(String carId, Double amount);
 
     Payment getPayment(String paymentId);
 
