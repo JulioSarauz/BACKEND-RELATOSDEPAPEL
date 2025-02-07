@@ -66,27 +66,30 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Car createCar(CreateCarRequest request) {
-        List<Book> books = request.getBooks().stream().map(booksFacade::getBook).filter(Objects::nonNull).toList();
-        System.out.println("libros");
-        System.out.println(books);
-        //Otra opcion: Jakarta Validation: https://www.baeldung.com/java-validation
-        if (   request != null && StringUtils.hasLength(request.getCodCar().trim())
-                && request.getBookId() != null
-                && request.getItems() >= 0
-                && request.getPrice() >= 0
-        ) {
+        Book book = booksFacade.getBook(request.getBookId());
+        if(book.getIsVisible() && book.getStock() > 0){
+            //Otra opcion: Jakarta Validation: https://www.baeldung.com/java-validation
+            if (   request != null && StringUtils.hasLength(request.getCodCar().trim())
+                    && request.getBookId() != null
+                    && request.getItems() >= 0
+                    && request.getPrice() >= 0
+            ) {
 
-            Car car = Car.builder()
-                    .codCar(request.getCodCar())
-                    .bookId(request.getBookId())
-                    .items(request.getItems())
-                    .price(request.getPrice())
-                    .build();
+                Car car = Car.builder()
+                        .codCar(request.getCodCar())
+                        .bookId(request.getBookId())
+                        .items(request.getItems())
+                        .price(request.getPrice())
+                        .build();
 
-            return repository.save(car);
-        } else {
-            return null;
+                return repository.save(car);
+            } else {
+                return null;
+            }
+        }else{
+                return null;
         }
+
     }
 
     @Override

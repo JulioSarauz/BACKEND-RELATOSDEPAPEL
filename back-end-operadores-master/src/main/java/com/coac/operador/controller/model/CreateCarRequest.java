@@ -18,7 +18,7 @@ public class CreateCarRequest {
     private Long bookId;
     private Long items;
     double price;
-    @NotNull(message = "`books` cannot be null")
-    @NotEmpty(message = "`books` cannot be empty")
-    private List<Long> books;
+    //@NotNull(message = "`books` cannot be null")
+    //@NotEmpty(message = "`books` cannot be empty")
+    //private List<Long> books;
 }
