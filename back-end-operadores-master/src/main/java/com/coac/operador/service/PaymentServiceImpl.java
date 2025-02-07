@@ -4,8 +4,12 @@ import java.util.List;
 
 import com.coac.operador.controller.model.CreatePaymentRequest;
 import com.coac.operador.controller.model.PaymentDto;
+import com.coac.operador.data.CarRepository;
 import com.coac.operador.data.PaymentRepository;
+import com.coac.operador.data.model.Car;
 import com.coac.operador.data.model.Payment;
+import com.coac.operador.facade.BooksFacade;
+import com.coac.operador.facade.model.Book;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,11 +25,17 @@ import org.springframework.util.StringUtils;
 @Service
 @Slf4j
 public class PaymentServiceImpl implements PaymentService {
+
+    @Autowired //Inyeccion por campo (field injection). Es la menos recomendada.
+    private BooksFacade booksFacade;
+
     @Autowired
     private PaymentRepository repository;
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private CarRepository carRepository;
 
     @Override
     public List<Payment> getPayments(String carId, Double amount) {
@@ -58,17 +68,27 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment createPayment(CreatePaymentRequest request) {
+        Car car = carRepository.getById(Long.parseLong(request.getCarId()));
+        if(car != null) {
+            Book book = booksFacade.getBook(car.getBookId());
+            if(book.getIsVisible() && book.getStock() > 0){
+            //Otra opcion: Jakarta Validation: https://www.baeldung.com/java-validation
+            if (request != null && StringUtils.hasLength(request.getCarId().trim())
+                    && request.getAmount() != null) {
 
-        //Otra opcion: Jakarta Validation: https://www.baeldung.com/java-validation
-        if (request != null && StringUtils.hasLength(request.getCarId().trim())
-                && request.getAmount() != null) {
+                Payment payment = Payment.builder().carId(request.getCarId()).amount(request.getAmount()).build();
 
-            Payment payment = Payment.builder().carId(request.getCarId()).amount(request.getAmount()).build();
-
-            return repository.save(payment);
-        } else {
+                return repository.save(payment);
+            } else {
+                return null;
+            }
+            }else{
+                return null;
+            }
+        }else{
             return null;
         }
+
     }
 
     @Override
