@@ -68,6 +68,8 @@ public class BookService {
             book.setIsVisible(bookDetails.getIsVisible());
             book.setPrice(bookDetails.getPrice());
             book.setStock(bookDetails.getStock());
+            book.setImage(bookDetails.getImage());
+            book.setSummary(bookDetails.getSummary());
 
             // 🔹 Verificar si la categoría cambió y buscarla en la BD
             if (bookDetails.getCategory() != null && bookDetails.getCategory().getId() != null) {
