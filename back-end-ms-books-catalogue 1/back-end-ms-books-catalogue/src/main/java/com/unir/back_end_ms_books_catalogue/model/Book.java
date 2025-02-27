@@ -42,13 +42,6 @@ public class Book {
     @Column(nullable = false)
     private Boolean isVisible; // Indica si el libro está disponible o no
 
-
-    @Column(nullable = false, length = 10000)
-    private String summary;
-
-    @Column(nullable = false)
-    private String image;
-
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
