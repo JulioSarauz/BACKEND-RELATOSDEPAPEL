@@ -1,6 +1,5 @@
 package com.unir.back_end_ms_books_catalogue.data;
 
-
 import com.unir.back_end_ms_books_catalogue.controller.model.AggregationDetails;
 import com.unir.back_end_ms_books_catalogue.data.model.Book;
 import com.unir.back_end_ms_books_catalogue.utils.Consts;
@@ -8,7 +7,6 @@ import com.unir.back_end_ms_books_catalogue.controller.model.BooksQueryResponse;
 import lombok.SneakyThrows;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -28,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 @Repository
 @RequiredArgsConstructor
 @Slf4j
@@ -35,8 +34,6 @@ public class DataAccessRepository {
 
     private final BookRepositoryElastic bookRepositoryElastic;
     private final ElasticsearchOperations elasticClient;
-
-    private final String[] addressFields = {"address", "address._2gram", "address._3gram"};
 
     @SneakyThrows
     public BooksQueryResponse findBooks(
@@ -46,128 +43,106 @@ public class DataAccessRepository {
             List<String> publicationDateValues,
             List<String> ratingValues,
             String title,
-            String address,
             String page) {
 
-        BoolQueryBuilder querySpec = QueryBuilders.boolQuery();
+        try {
+            BoolQueryBuilder querySpec = QueryBuilders.boolQuery();
 
-        // Filtros de categoría
-        if (categoryValues != null && !categoryValues.isEmpty()) {
-            categoryValues.forEach(
-                    category -> querySpec.must(QueryBuilders.termQuery(Consts.FIELD_CATEGORY_ID, category))
-            );
-        }
+            // Filtrar por autor
+            if (authorValues != null && !authorValues.isEmpty()) {
+                authorValues.forEach(
+                        author -> querySpec.must(QueryBuilders.termQuery("author.keyword", author))
+                );
+            }
 
-        // Filtro por título
-        if (StringUtils.isNotEmpty(title)) {
-            querySpec.must(QueryBuilders.matchQuery(Consts.FIELD_TITLE, title));
-        }
+            // Filtrar por categoría
+            if (categoryValues != null && !categoryValues.isEmpty()) {
+                categoryValues.forEach(
+                        category -> querySpec.must(QueryBuilders.termQuery("category.keyword", category))
+                );
+            }
 
-        // Filtro por dirección
-        if (StringUtils.isNotEmpty(address)) {
-            querySpec.must(QueryBuilders.multiMatchQuery(address, addressFields)
-                    .type(MultiMatchQueryBuilder.Type.BOOL_PREFIX));
-        }
+            // Filtrar por ISBN
+            if (isbnValues != null && !isbnValues.isEmpty()) {
+                isbnValues.forEach(
+                        isbn -> querySpec.must(QueryBuilders.termQuery("isbn.keyword", isbn))
+                );
+            }
 
-        // Filtro por autor
-        if (authorValues != null && !authorValues.isEmpty()) {
-            authorValues.forEach(
-                    author -> querySpec.must(QueryBuilders.termQuery(Consts.FIELD_AUTHOR, author))
-            );
-        }
-
-        // Filtro por ISBN
-        if (isbnValues != null && !isbnValues.isEmpty()) {
-            isbnValues.forEach(
-                    isbn -> querySpec.must(QueryBuilders.termQuery(Consts.FIELD_ISBN, isbn))
-            );
-        }
-
-        // Filtro por fecha de publicación
-        if (publicationDateValues != null && !publicationDateValues.isEmpty()) {
-            publicationDateValues.forEach(
-                    dateRange -> {
-                        String[] range = dateRange.split("-");
-                        if (range.length == 2) {
-                            querySpec.must(QueryBuilders.rangeQuery(Consts.FIELD_PUBLICATION_DATE)
-                                    .from(range[0])
-                                    .to(range[1])
-                                    .includeUpper(false));
-                        } else if (range.length == 1) {
-                            querySpec.must(QueryBuilders.rangeQuery(Consts.FIELD_PUBLICATION_DATE)
-                                    .from(range[0]));
+            // Filtrar por fecha de publicación
+            if (publicationDateValues != null && !publicationDateValues.isEmpty()) {
+                publicationDateValues.forEach(
+                        dateRange -> {
+                            String[] range = dateRange.split("-");
+                            if (range.length == 2) {
+                                querySpec.must(QueryBuilders.rangeQuery("publication_date")
+                                        .from(range[0])
+                                        .to(range[1])
+                                        .includeUpper(false));
+                            } else if (range.length == 1) {
+                                querySpec.must(QueryBuilders.rangeQuery("publication_date")
+                                        .from(range[0]));
+                            }
                         }
-                    }
-            );
-        }
+                );
+            }
 
-        // Filtro por rating
-        if (ratingValues != null && !ratingValues.isEmpty()) {
-            ratingValues.forEach(
-                    ratingRange -> {
-                        String[] range = ratingRange.split("-");
-                        if (range.length == 2) {
-                            querySpec.must(QueryBuilders.rangeQuery(Consts.FIELD_RATING)
-                                    .from(range[0])
-                                    .to(range[1])
-                                    .includeUpper(false));
-                        } else if (range.length == 1) {
-                            querySpec.must(QueryBuilders.rangeQuery(Consts.FIELD_RATING)
-                                    .from(range[0]));
+            // Filtrar por rating
+            if (ratingValues != null && !ratingValues.isEmpty()) {
+                ratingValues.forEach(
+                        ratingRange -> {
+                            String[] range = ratingRange.split("-");
+                            if (range.length == 2) {
+                                querySpec.must(QueryBuilders.rangeQuery("rating")
+                                        .from(range[0])
+                                        .to(range[1])
+                                        .includeUpper(false));
+                            } else if (range.length == 1) {
+                                querySpec.must(QueryBuilders.rangeQuery("rating")
+                                        .from(range[0]));
+                            }
                         }
-                    }
-            );
-        }
-
-        // Si no hay filtros, agregamos un `matchAllQuery`
-        if (!querySpec.hasClauses()) {
-            querySpec.must(QueryBuilders.matchAllQuery());
-        }
-
-        // Construcción de la consulta
-        NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder().withQuery(querySpec);
-
-        // Agregaciones de términos
-        searchQueryBuilder.addAggregation(AggregationBuilders
-                .terms(Consts.AGG_KEY_TERM_CATEGORY)
-                .field(Consts.FIELD_CATEGORY_ID)
-                .size(10000));
-
-        searchQueryBuilder.addAggregation(AggregationBuilders
-                .terms(Consts.AGG_KEY_TERM_AUTHOR)
-                .field(Consts.FIELD_AUTHOR)
-                .size(10000));
-
-        searchQueryBuilder.addAggregation(AggregationBuilders
-                .terms(Consts.AGG_KEY_TERM_ISBN)
-                .field(Consts.FIELD_ISBN)
-                .size(10000));
-
-        // Agregaciones de rango
-        searchQueryBuilder.addAggregation(AggregationBuilders
-                .range(Consts.AGG_KEY_RANGE_PUBLICATION_DATE)
-                .field(Consts.FIELD_PUBLICATION_DATE)
-                .addUnboundedTo("before_2000", 2000)
-                .addRange("2000-2010", 2000, 2010)
-                .addUnboundedFrom("after_2010", 2010));
+                );
+            }
 
 
-        searchQueryBuilder.addAggregation(AggregationBuilders
-                .range(Consts.AGG_KEY_RANGE_RATING)
-                .field(Consts.FIELD_RATING)
-                .addUnboundedTo("low", 2.0)
-                .addRange("medium", 2.0, 4.0)
-                .addUnboundedFrom("high", 4.0));
+// Filtro si no se aplica ninguno de los anteriores
+            if (!querySpec.hasClauses()) {
+                querySpec.must(QueryBuilders.matchAllQuery());
+            }
 
-        // Configuración de paginación
-        int pageInt = Integer.parseInt(page);
-        if (pageInt >= 0) {
+// Construcción de la consulta
+            NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder().withQuery(querySpec);
+
+// Agregaciones
+            searchQueryBuilder.addAggregation(AggregationBuilders.terms("agg_author").field("author.keyword").size(10));
+
+// Paginación
+            int pageInt = (page != null && !page.isEmpty()) ? Integer.parseInt(page) : 0;
             searchQueryBuilder.withPageable(PageRequest.of(pageInt, 5));
+
+// Ejecutar la consulta
+            Query query = searchQueryBuilder.build();
+
+// Imprimir la consulta en formato JSON
+            String queryJson = query.toString();
+            log.info("Consulta generada: {}", queryJson);
+
+// Ejecutar la consulta en Elasticsearch
+            SearchHits<Book> result = elasticClient.search(query, Book.class);
+
+// Obtener los libros y agregaciones
+            List<Book> books = getResponseBooks(result);
+            Map<String, List<AggregationDetails>> aggregations = getResponseAggregations(result);
+
+// Devuelve la respuesta con los libros y las agregaciones
+            return new BooksQueryResponse(books, aggregations);
+
+        } catch (Exception e) {
+            log.error("Error al ejecutar la consulta", e);
         }
 
-        Query query = searchQueryBuilder.build();
-        SearchHits<Book> result = elasticClient.search(query, Book.class);
-        return new BooksQueryResponse(getResponseBooks(result), getResponseAggregations(result));
+        return null;
     }
 
     private List<Book> getResponseBooks(SearchHits<Book> result) {

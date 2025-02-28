@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -21,24 +20,23 @@ public class BookControllerElastic {
 
     @GetMapping("/bookelastic")
     public ResponseEntity<BooksQueryResponse> getBooks(
-            @RequestParam(required = false) List<String> genderValues,
-            @RequestParam(required = false) List<String> designationValues,
-            @RequestParam(required = false) List<String> civilStatusValues,
-            @RequestParam(required = false) List<String> ageValues,
-            @RequestParam(required = false) List<String> salaryValues,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String address,
+            @RequestParam(required = false) List<String> categoryValues,
+            @RequestParam(required = false) List<String> authorValues,
+            @RequestParam(required = false) List<String> isbnValues,
+            @RequestParam(required = false) List<String> publicationDateValues,
+            @RequestParam(required = false) List<String> ratingValues,
+            @RequestParam(required = false) String title,
             @RequestParam(required = false, defaultValue = "0") String page) {
 
-        BooksQueryResponse response = service.getBooks( 
-                genderValues,
-                designationValues,
-                civilStatusValues,
-                ageValues,
-                salaryValues,
-                name,
-                address,
-                page);
+        BooksQueryResponse response = service.getBooks(
+                categoryValues,
+                authorValues,
+                isbnValues,
+                publicationDateValues,
+                ratingValues,
+                title,
+                page); // Eliminamos el parámetro address
         return ResponseEntity.ok(response);
     }
+
 }

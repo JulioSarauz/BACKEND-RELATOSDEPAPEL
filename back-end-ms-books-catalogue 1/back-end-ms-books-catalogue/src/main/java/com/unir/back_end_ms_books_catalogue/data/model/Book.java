@@ -15,7 +15,7 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 
-@Document(indexName = "employees", createIndex = true)
+@Document(indexName = "books", createIndex = true)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -39,16 +39,16 @@ public class Book {
     private LocalDate publication_date;
 
     @Field(type = FieldType.Text, format = DateFormat.date, name = Consts.FIELD_RATING)
-    private String rating;
+    private Double rating;
 
     @Field(type = FieldType.Text, name = Consts.FIELD_PRICE)
-    private String price;
+    private Integer price;
 
     @Field(type = FieldType.Text, name = Consts.FIELD_STOCK)
-    private String stock;
+    private Integer stock;
 
     @Field(type = FieldType.Text, name = Consts.FIELD_IS_VISIBLE)
-    private String is_visible;
+    private Boolean is_visible;
 
     @Field(type = FieldType.Keyword, name = Consts.FIELD_CATEGORY_ID)
     private String category_id;

@@ -1,4 +1,5 @@
 package com.unir.back_end_ms_books_catalogue.service;
+
 import com.unir.back_end_ms_books_catalogue.controller.model.BooksQueryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,6 @@ public class BookServiceElastic {
             List<String> publicationDateValues,
             List<String> ratingValues,
             String title,
-            String address,
             String page) {
         return repository.findBooks(
                 categoryValues,
@@ -29,8 +29,8 @@ public class BookServiceElastic {
                 publicationDateValues,
                 ratingValues,
                 title,
-                address,
-                page);
+                page
+        );
     }
 
 }

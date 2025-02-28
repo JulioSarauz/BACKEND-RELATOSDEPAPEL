@@ -20,16 +20,8 @@ public class Consts {  private Consts() {
     public static final String AGG_KEY_TERM_CATEGORY = "categoryValues";
     public static final String AGG_KEY_TERM_AUTHOR = "authorValues";
     public static final String AGG_KEY_TERM_ISBN = "isbnValues";
-
     public static final String AGG_KEY_RANGE_PUBLICATION_DATE = "publicationDateValues";
-    public static final String AGG_KEY_RANGE_PUBLICATION_DATE_0 = "-2000-01-01";
-    public static final String AGG_KEY_RANGE_PUBLICATION_DATE_1 = "2000-01-01-2015-12-31";
-    public static final String AGG_KEY_RANGE_PUBLICATION_DATE_2 = "2016-";
-
     public static final String AGG_KEY_RANGE_RATING = "ratingValues";
-    public static final String AGG_KEY_RANGE_RATING_0 = "-2.5";
-    public static final String AGG_KEY_RANGE_RATING_1 = "2.5-4.0";
-    public static final String AGG_KEY_RANGE_RATING_2 = "4.0-";
 
 
 
