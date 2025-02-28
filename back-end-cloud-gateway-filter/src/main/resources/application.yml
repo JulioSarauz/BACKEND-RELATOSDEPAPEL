@@ -5,13 +5,13 @@ server:
 eureka:
   instance:
     preferIpAddress: true
-    hostname: ${HOSTNAME:172.17.0.2}
+    hostname: ${HOSTNAME:eureka-production-637b.up.railway.app}
     
   client:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: ${EUREKA_URL:http://172.17.0.2:8761/eureka}
+      defaultZone: ${EUREKA_URL:https://eureka-production-637b.up.railway.app:8761/eureka}
       
 
 ## Enable service discovery (with Eureka)
